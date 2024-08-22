@@ -1,30 +1,48 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApplicationDBManager.DBContext;
+using WebApplicationDBManager.Interface;
+using WebApplicationDBManager.Models;
 using WebApplicationDBManager.ViewModels;
 
 namespace dotNetWebApplication.Controllers
 {
-    [Route("api/[controller]")]
+    
     [ApiController]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        public UsersController(AppDbContext dbContext)
+        private readonly IUserRepository _userRepo;
+        public UsersController(IUserRepository userRepo)
         {
-            _context = dbContext;
+            _userRepo = userRepo;
         }
 
         [HttpGet]
+        [Route("GetUsers")]
         public IActionResult GetUsers()
         {
-            return Ok(200);
+            var usersList = _userRepo.GetUsers();
+            if(usersList.FirstOrDefault().GetType() == typeof(UserViewModel))
+            {
+                return Ok(usersList);
+            }
+            else
+            {
+                return BadRequest(usersList.FirstOrDefault());
+            }
         }
 
         [HttpPost]
-        public IActionResult AddUsers()
+        [Route("AddUser")]
+        public IActionResult AddUser(UserViewModel userVM)
         {
-            return Ok(200);
+            var user = _userRepo.AddUser(userVM);
+            if(user.GetType() == typeof(User))
+            {
+                return Ok(user);
+            }
+            return BadRequest(user);
         }
     }
 }

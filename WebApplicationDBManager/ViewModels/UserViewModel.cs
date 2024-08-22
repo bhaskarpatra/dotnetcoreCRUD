@@ -10,6 +10,7 @@ namespace WebApplicationDBManager.ViewModels
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public string Password { get; set; }
+        public string CreatedOn { get; set; } 
     }
 }

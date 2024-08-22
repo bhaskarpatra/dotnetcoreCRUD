@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplicationDBManager.DBContext;
+using WebApplicationDBManager.Interface;
+using WebApplicationDBManager.UsersRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("ConnString")));
-builder.Services.AddControllers();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
