@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApplicationDBManager.DBContext;
 using WebApplicationDBManager.Interface;
 using WebApplicationDBManager.Models;
 using WebApplicationDBManager.ViewModels;
 
 namespace dotNetWebApplication.Controllers
 {
-    
+
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -18,6 +17,19 @@ namespace dotNetWebApplication.Controllers
             _userRepo = userRepo;
         }
 
+        [HttpPost]
+        [Route("Login")]
+        public IActionResult Login(UserViewModel userVM)
+        {
+            var response = _userRepo.Login(userVM);
+            if (response.GetType() == typeof(String))
+            {
+                return Ok(new { userVM, response });
+            }
+            return BadRequest(response);            
+        }
+
+        [Authorize]
         [HttpGet]
         [Route("GetUsers")]
         public IActionResult GetUsers()
