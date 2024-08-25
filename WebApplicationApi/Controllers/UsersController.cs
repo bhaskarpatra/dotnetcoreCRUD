@@ -29,7 +29,7 @@ namespace dotNetWebApplication.Controllers
             return BadRequest(response);            
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         [Route("GetUsers")]
         public IActionResult GetUsers()
