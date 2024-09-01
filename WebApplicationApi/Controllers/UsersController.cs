@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using WebApplicationDBManager.Interface;
 using WebApplicationDBManager.Models;
@@ -29,7 +30,7 @@ namespace dotNetWebApplication.Controllers
             return BadRequest(response);            
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [Route("GetUsers")]
         public IActionResult GetUsers()
@@ -45,12 +46,26 @@ namespace dotNetWebApplication.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         [Route("AddUser")]
         public IActionResult AddUser(UserViewModel userVM)
         {
             var user = _userRepo.AddUser(userVM);
             if(user.GetType() == typeof(User))
+            {
+                return Ok(user);
+            }
+            return BadRequest(user);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("UpdateUser")]
+        public IActionResult UpdateUser(UserViewModel userVM)
+        {
+            var user = _userRepo.UpdateUser(userVM);
+            if (user.GetType() == typeof(User))
             {
                 return Ok(user);
             }

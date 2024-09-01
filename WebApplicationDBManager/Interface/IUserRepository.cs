@@ -13,6 +13,7 @@ namespace WebApplicationDBManager.Interface
         public List<object> GetUsers();
         
         public object AddUser(UserViewModel user);
+        public object UpdateUser(UserViewModel user);
         public object Login(UserViewModel user);
     }
 }

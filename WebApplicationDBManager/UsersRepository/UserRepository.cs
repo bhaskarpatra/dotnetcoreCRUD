@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -56,6 +57,42 @@ namespace WebApplicationDBManager.UsersRepository
             }
             return response;
         }
+        
+        public object UpdateUser(UserViewModel user)
+        {
+            var response = new object();
+            try
+            {
+                if (user != null)
+                {
+                    User updateUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
+                    
+                    if(updateUser != null)
+                    {
+                        updateUser.Name = user.Name;
+                        response = updateUser;
+                        _context.SaveChanges();
+                    }                    
+                }
+                else
+                {
+                    response = new ErrorResponse
+                    {
+                        Code = 404,
+                        Message = "User is null",
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                response = new ErrorResponse
+                {
+                    Code = 404,
+                    Message = ex.Message,
+                };
+            }
+            return response;
+        }
 
         public List<object> GetUsers()
         {
@@ -72,7 +109,7 @@ namespace WebApplicationDBManager.UsersRepository
                             CreatedOn = DateTime.Parse(user.CreatedOn).ToString("h:mm tt, dd-MM-yyyy"),
                             Email = user.Email,
                             Name = user.Name,
-                            Password = "N/A",
+                            Password = user.Password,
                         };
                         response.Add(userViewModel);
                     }
@@ -127,10 +164,11 @@ namespace WebApplicationDBManager.UsersRepository
                                 _configuration["Jwt:Issuer"],
                                 _configuration["Jwt:Audience"],
                                 claims,
-                                expires: DateTime.UtcNow.AddSeconds(30),
+                                expires: DateTime.UtcNow.AddDays(3),
                                 signingCredentials: signIn
                                 );
                             string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
+                            userVm.Name = user.Name;
                             response = tokenValue;
                         }
                         else { errorMessage += $"| Wrong Email or password, "; }                        

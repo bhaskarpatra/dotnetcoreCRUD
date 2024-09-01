@@ -1,3 +1,4 @@
+using dotNetWebApplication.BackgroudService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -58,9 +59,23 @@ builder.Services.AddDbContext<AppDbContext>(x => x.UseNpgsql(builder.Configurati
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddSingleton<SampleData>();
+
+builder.Services.AddHostedService<MyWorkerService>();
+
+string mycorsPolicy = "myPolicy";
+builder.Services.AddCors(op =>
+{
+    op.AddPolicy(mycorsPolicy, policy =>
+    {
+        policy.WithOrigins("http://localhost:4200/").AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+    });
+}
+);
+
 var app = builder.Build();
 
-//app.UseAuthentication();
+app.UseAuthentication();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -73,6 +88,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors(policy => policy.AllowAnyOrigin());
+app.UseCors(mycorsPolicy);
+
+app.MapGet("/WorkerService", (SampleData data) => data.Data.Order());
+
 
 app.Run();
